@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from import sleep
+from time import sleep
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
@@ -31,10 +31,7 @@ def setup():
 #GPIO.output(pinNum,GPIO.LOW) // Active
 #GPIO.output(pinNum,GPIO.HIGH) // Inactive
 
-def btnUnpressed():
-    while True:
-        if GPIO.input(btn) == GPIO.HIGH:
-            break
+def callbackDetect(input_pin): 
     btnPressed()
 
 def btnPressed(): # Naive Segmented method Linear
@@ -48,6 +45,7 @@ def btnPressed(): # Naive Segmented method Linear
 
     GPIO.output(rgb2Pins['ledR'],GPIO.LOW)
     GPIO.output(rgb1Pins['ledG'],GPIO.LOW)
+    GPIO.output(rgb1Pins['ledR'],GPIO.HIGH)
 
     countdown()
 
@@ -59,7 +57,6 @@ def btnPressed(): # Naive Segmented method Linear
         GPIO.output(timerPins[i],GPIO.HIGH)
     
     sleep(8)
-    btnUnpressed()
 
 def countdown():
     GPIO.output(timerPins['A'],GPIO.LOW)
@@ -135,7 +132,7 @@ def countdown():
 def main():
     setup()
     GPIO.output(rgb2Pins['ledG'],GPIO.LOW) # LED 2 Stays green
-    btnUnpressed()
+    GPIO.add_event_detect(btn, GPIO.RISING, callback=callbackDetect)
 
 if __name__ == "__main__":
     main()
