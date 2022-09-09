@@ -51,12 +51,14 @@ def btnPressed(): # Naive Segmented method Linear
 
     countdown()
 
+    GPIO.output(rgb2Pins['ledR'],GPIO.HIGH)
     GPIO.output(rgb1Pins['ledR'],GPIO.LOW)
     GPIO.output(rgb2Pins['ledG'],GPIO.LOW)
 
     for i in timerPins:
         GPIO.output(timerPins[i],GPIO.HIGH)
     
+    sleep(8)
     btnUnpressed()
 
 def countdown():
@@ -92,8 +94,9 @@ def countdown():
         GPIO.output(rgb1Pins['ledB'],GPIO.LOW)
         sleep(.25)
         GPIO.output(rgb1Pins['ledB'],GPIO.HIGH)
-        sleep(.25)    GPIO.output(timerPins['A'],GPIO.LOW)
+        sleep(.25)    
 
+    GPIO.output(timerPins['A'],GPIO.LOW)
     GPIO.output(timerPins['D'],GPIO.LOW)
     GPIO.output(timerPins['F'],GPIO.HIGH)
 
