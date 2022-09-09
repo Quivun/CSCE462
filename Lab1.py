@@ -1,17 +1,15 @@
 import RPi.GPIO as GPIO
-from time import sleep
+from import sleep
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
-GPIO.setup(channel, GPIO.OUT, initial=GPIO.HIGH) 
-
 rgb1Pins = {'ledR' : 22, 'ledG' : 27, 'ledB' : 17}
 rgb2Pins = {'ledR' : 25, 'ledG' : 24, 'ledB' : 23}
-timerPins = {'timerA' : 16, 'timerB' : 12, 'timerC' : 13, 'timerD' : 19, 'timerE' : 26, 'timerF' : 20, 'timerG' : 21, 'timerDP' : 6}
+timerPins = {'A' : 16, 'B' : 12, 'C' : 13, 'D' : 19, 'E' : 26, 'F' : 20, 'G' : 21, 'DP' : 6}
 btn = 18
 
 def setup():
-    GPIO.setup(10, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
+    GPIO.setup(btn, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
 
     for i in rgb1Pins:
         GPIO.setup(rgb1Pins[i], GPIO.OUT)
@@ -54,47 +52,39 @@ def btnPressed(): # Naive Segmented method Linear
     countdown()
 
     GPIO.output(rgb1Pins['ledR'],GPIO.LOW)
+    GPIO.output(rgb2Pins['ledG'],GPIO.LOW)
+
+    for i in timerPins:
+        GPIO.output(timerPins[i],GPIO.HIGH)
     
     btnUnpressed()
 
 def countdown():
-    GPIO.output(19,False)
-    GPIO.output(16,False)
-    GPIO.output(12,False)
-    GPIO.output(26,False)
-    GPIO.output(20,True)
-    GPIO.output(21,True)
-    GPIO.output(13,True)
-    time.sleep(1)
-    GPIO.output(20,False)
-    GPIO.output(21,False)
-    GPIO.output(13,False)
-    time.sleep(1)
-    GPIO.output(20,True)
-    GPIO.output(19,True)
-    GPIO.output(13,True)
-    GPIO.output(16,True)
-    GPIO.output(12,True)
-    GPIO.output(26,True)
-    time.sleep(1)
-    GPIO.output(20,False)
-    GPIO.output(19,False)
-    GPIO.output(13,False)
-    GPIO.output(16,False)
-    GPIO.output(12,False)
-    GPIO.output(26,False)
-    time.sleep(1)
-    GPIO.output(20,True)
-    GPIO.output(19,True)
-    GPIO.output(13,True)
-    GPIO.output(16,True)
-    GPIO.output(12,True)
-    time.sleep(1)
-    GPIO.output(20,False)
-    GPIO.output(19,False)
-    GPIO.output(13,False)
-    GPIO.output(16,False)
-    GPIO.output(12,False)
+    GPIO.output(timerPins['A'],GPIO.LOW)
+    GPIO.output(timerPins['B'],GPIO.LOW)
+    GPIO.output(timerPins['C'],GPIO.LOW)
+    GPIO.output(timerPins['D'],GPIO.LOW)
+    GPIO.output(timerPins['F'],GPIO.LOW)
+    GPIO.output(timerPins['G'],GPIO.LOW)
+    sleep(1)
+    GPIO.output(timerPins['E'],GPIO.LOW)
+    sleep(1)
+    GPIO.output(timerPins['D'],GPIO.HIGH)
+    GPIO.output(timerPins['E'],GPIO.HIGH)
+    GPIO.output(timerPins['F'],GPIO.HIGH)
+    GPIO.output(timerPins['G'],GPIO.HIGH)
+    sleep(1)
+    GPIO.output(timerPins['B'],GPIO.HIGH)
+    GPIO.output(timerPins['D'],GPIO.LOW)
+    GPIO.output(timerPins['E'],GPIO.LOW)
+    GPIO.output(timerPins['F'],GPIO.LOW)
+    GPIO.output(timerPins['G'],GPIO.LOW)
+    sleep(1)
+    GPIO.output(timerPins['E'],GPIO.HIGH)
+    sleep(1)
+    GPIO.output(timerPins['A'],GPIO.HIGH)
+    GPIO.output(timerPins['B'],GPIO.LOW)
+    GPIO.output(timerPins['D'],GPIO.HIGH)
     
     GPIO.output(rgb1Pins['ledG'],GPIO.HIGH)
 
@@ -102,12 +92,10 @@ def countdown():
         GPIO.output(rgb1Pins['ledB'],GPIO.LOW)
         sleep(.25)
         GPIO.output(rgb1Pins['ledB'],GPIO.HIGH)
-        sleep(.25)
+        sleep(.25)    GPIO.output(timerPins['A'],GPIO.LOW)
 
-    GPIO.output(21,True)
-    GPIO.output(13,True)
-    GPIO.output(16,True)
-    GPIO.output(12,True)
+    GPIO.output(timerPins['D'],GPIO.LOW)
+    GPIO.output(timerPins['F'],GPIO.HIGH)
 
     for i in range(0,2):
         GPIO.output(rgb1Pins['ledB'],GPIO.LOW)
@@ -115,56 +103,32 @@ def countdown():
         GPIO.output(rgb1Pins['ledB'],GPIO.HIGH)
         sleep(.25)
 
-    GPIO.output(21,False)
-    GPIO.output(13,False)
-    GPIO.output(16,False)
-    GPIO.output(12,False)
-    time.sleep(1)
-    GPIO.output(20,True)
-    GPIO.output(19,True)
-    GPIO.output(21,True)
-    GPIO.output(13,True)
-    GPIO.output(12,True)
-    time.sleep(1)
-    GPIO.output(20,False)
-    GPIO.output(19,False)
-    GPIO.output(21,False)
-    GPIO.output(13,False)
-    GPIO.output(12,False)
-    time.sleep(1)
-    GPIO.output(20,True)
-    GPIO.output(19,True)
-    GPIO.output(21,True)
-    GPIO.output(12,True)
-    GPIO.output(26,True)
-    time.sleep(1)
-    GPIO.output(20,False)
-    GPIO.output(19,False)
-    GPIO.output(21,False)
-    GPIO.output(12,False)
-    GPIO.output(26,False)
-    time.sleep(1)
-    GPIO.output(21,True)
-    GPIO.output(13,True)
-    time.sleep(1)
-    GPIO.output(21,False)
-    GPIO.output(13,False)
-    time.sleep(1)
-    GPIO.output(20,True)
-    GPIO.output(19,True)
-    GPIO.output(21,True)
-    GPIO.output(13,True)
-    GPIO.output(16,True)
-    GPIO.output(26,True)
-    time.sleep(1)
-    GPIO.output(20,False)
-    GPIO.output(19,False)
-    GPIO.output(21,False)
-    GPIO.output(13,False)
-    GPIO.output(16,False)
-    GPIO.output(26,False)
-    time.sleep(1)
+    GPIO.output(timerPins['C'],GPIO.HIGH)
+    GPIO.output(timerPins['E'],GPIO.LOW)
+
+    for i in range(0,2):
+        GPIO.output(rgb1Pins['ledB'],GPIO.LOW)
+        sleep(.25)
+        GPIO.output(rgb1Pins['ledB'],GPIO.HIGH)
+        sleep(.25)
+
+    GPIO.output(timerPins['A'],GPIO.HIGH)
+    GPIO.output(timerPins['C'],GPIO.LOW)
+    GPIO.output(timerPins['D'],GPIO.HIGH)
+    GPIO.output(timerPins['E'],GPIO.HIGH)
+    GPIO.output(timerPins['G'],GPIO.HIGH)
+
+    for i in range(0,2):
+        GPIO.output(rgb1Pins['ledB'],GPIO.LOW)
+        sleep(.25)
+        GPIO.output(rgb1Pins['ledB'],GPIO.HIGH)
+        sleep(.25)
     
+    GPIO.output(timerPins['A'],GPIO.LOW)
+    GPIO.output(timerPins['D'],GPIO.LOW)
+    GPIO.output(timerPins['E'],GPIO.LOW)
+    GPIO.output(timerPins['F'],GPIO.LOW)
+
 def main():
     setup()
     GPIO.output(rgb2Pins['ledG'],GPIO.LOW) # LED 2 Stays green
