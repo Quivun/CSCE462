@@ -133,6 +133,8 @@ def main():
     setup()
     GPIO.output(rgb2Pins['ledG'],GPIO.LOW) # LED 2 Stays green
     GPIO.add_event_detect(btn, GPIO.RISING, callback=callbackDetect)
+    while(True):
+        sleep(5)
 
 if __name__ == "__main__":
     main()
