@@ -1,3 +1,4 @@
+import wave
 import board
 import busio
 import adafruit_mcp4725
@@ -6,10 +7,10 @@ import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
+from busio import l2c
 from time import sleep
-from math import sin
+from math import sin,pi
 
-pins = {"SCL":3,"SDA":2}
 btn = 4
 
 """
@@ -24,40 +25,67 @@ Vout is analog output -> To oscilloscope [0,3.3]V
 
 """
 
+# Globals delta,waveform,frequency,voltageMax
+
+funcDict = {"1" : waveformSquare, "2" : waveformTriangle, "3" : waveformSin}
+
 def setup():
     GPIO.setup(btn, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) 
 
 def btnPress():
-    waveform = int(input("Enter Waveform : 1 for Square, 2 for Triangle, and 3 for Sin"))
-    frequency = int(input("Enter Frequency : 1 for 10Hz, 2 for 25Hz, and 3 for 50Hz"))
-    voltageMax = int(input("Input maximum voltage"))
-    voltageMin = int(input("Input minimum voltage"))
-
-def waveformSquare(dac):
+    global delta
+    if (delta):
+        delta = False
+    global waveform
+    global frequency
+    global voltageMax
+    waveform = input("Enter Waveform : 1 for Square, 2 for Triangle, and 3 for Sin : ")
+    frequency = int(input("Enter, in hertz, the frequency of the wave : "))
+    voltageMax = float(input("Input maximum voltage [Less than or equal to 3.3V, will default to [0,3.3] if beyond either bounds : "))
+    delta = True
+    return (funcDict[waveform]())
+    
+def waveformSquare():
+    global delta
+    global dac
+    halfCycle = 1.0/(2.0*frequency)
+    while delta:
+        dac.set_voltage(int(voltageMax))
+        sleep(halfCycle)
+        dac.set_voltage(int(voltageMax))
     return
 
-def waveformTriangle(dac):
-    # Note : This may be too wide, will have to increase step range on oscilloscope test phase
-    for i in range(4095):
-        dac.raw_value = i
+def waveformTriangle():
+    global dac
+    halfCycle = 1.0/(2.0*frequency)
+    maxVal = int(4095.0*voltageMax/3.3)
+    tStep = halfCycle/maxVal
+    while delta:
+        for i in range(maxVal):
+            dac.raw_value = i
+            sleep(tStep)
+        for i in range(maxVal, -1, -1):
+            dac.raw_value = i
+            sleep(tStep)
+    return
+        
 
-    for i in range(4095, -1, -1):
-        dac.raw_value = i
-
-def waveformSin(dac):
+def waveformSin():
+    global dac
     t = 0.0
-    tStep = 0.05
-    while True:
-        voltage = 2048*(1.0+0.5*sin(6.2832*t))
-        dac.set_voltage(int(voltage))
+    fullCycle = 1.0/frequency
+    maxVal = int(4095.0*voltageMax/3.3)
+    tStep = fullCycle/maxVal
+    while delta:
+        if (t > 1):
+            t-=1
+        dac.raw_value(int((maxVal*sin(pi*2*t)+1)/2.0))
         t += tStep
-        time.sleep(0.0005)
-
-
-
-
+        sleep(tStep)
+    return
     
 def main():
+    global dac
     setup()
     i2c = busio.I2C(board.SCL, board.SDA) # Initialize I2C bus.
     dac = adafruit_mcp4725.MCP4725(i2c) # Initialize MCP4725.
@@ -69,14 +97,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Main loop will go up and down through the range of DAC values forever.
-while True:
-    # Go up the 12-bit raw range.
-    print("Going up 0-3.3V...")
-    for i in range(4095):
-        dac.raw_value = i
-    # Go back down the 12-bit raw range.
-    print("Going down 3.3-0V...")
-    for i in range(4095, -1, -1):
-        dac.raw_value = i
