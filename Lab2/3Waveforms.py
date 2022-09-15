@@ -1,12 +1,11 @@
 import board
-import busio
 import adafruit_mcp4725
 import RPi.GPIO as GPIO
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
-from busio import l2c
+from busio import I2C
 from time import sleep
 from math import sin,pi
 
@@ -86,7 +85,7 @@ def waveformSin():
 def main():
     global dac
     setup()
-    i2c = busio.I2C(board.SCL, board.SDA) # Initialize I2C bus.
+    i2c = I2C(board.SCL, board.SDA) # Initialize I2C bus.
     dac = adafruit_mcp4725.MCP4725(i2c) # Initialize MCP4725.
     # dac.value[0,65525], dac.raw_value[0,4095], dac.normalized_value[0,1.0](Floating Point)
     # "If you need the most precise output use the raw_output value for setting voltage." - Adafruit
