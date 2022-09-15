@@ -1,4 +1,3 @@
-import wave
 import board
 import busio
 import adafruit_mcp4725
@@ -44,7 +43,7 @@ def btnPress():
     voltageMax = float(input("Input maximum voltage [Less than or equal to 3.3V, will default to [0,3.3] if beyond either bounds : "))
     delta = True
     return (funcDict[waveform]())
-    
+
 def waveformSquare():
     global delta
     global dac
