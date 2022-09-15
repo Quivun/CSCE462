@@ -59,7 +59,7 @@ def waveformTriangle():
     maxVal = int(4095.0*voltageMax/3.3)
     tStep = halfCycle/maxVal
     while delta:
-        for i in range(maxVal):
+        for i in range(0,maxVal+1,1):
             dac.raw_value = i
             sleep(tStep)
         for i in range(maxVal, -1, -1):
