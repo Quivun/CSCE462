@@ -88,7 +88,6 @@ def waveformTriangle():
                 sleep(tStep - overHeadConstant)
     return
 
-
 def waveformSin():
     fullCycle = 1.0/frequency
     maxVal = int(4095.0*voltageMax/absMax)
@@ -99,14 +98,12 @@ def waveformSin():
             dac.raw_value(int(maxVal*(sin(pi*2*i/float(stepAmt))+1)/2.0))
     return
 
-
 def main():
     setup()
     dac.raw_value = 0
     GPIO.add_event_detect(btn, GPIO.FALLING, callback=btnPress)
     while(True):
         pass
-
 
 if __name__ == "__main__":
     main()
