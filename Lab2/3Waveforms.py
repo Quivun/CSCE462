@@ -24,7 +24,6 @@ Vout is analog output -> To oscilloscope [0,3.3]V
 """
 
 btn = 4
-funcDict = {"1": waveformSquare, "2": waveformTriangle, "3": waveformSin}
 i2c = I2C(board.SCL, board.SDA)  # Initialize I2C bus.
 
 #Globals
@@ -33,10 +32,10 @@ delta = False
 waveform = "NULL"
 frequency = 0
 voltageMax = 0.01
-absMax = 3.3
+absMax = 5
 
 def setup():
-    GPIO.setup(btn, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def changeCheck():
     return delta
@@ -54,56 +53,61 @@ def btnPress():
     frequency = int(input("Enter, in hertz, the frequency of the wave : "))
     voltageMax = float(input("Input maximum voltage [Less than or equal to 3.3V, will default to [0,3.3] if beyond either bounds : "))
     delta = True
-    return (funcDict[waveform]())
+    funcDict[waveform]()
+    return
 
 def waveformSquare():
     halfCycle = 1.0/(2.0*frequency)
-    while changeCheck():
-        dac.set_voltage = int(4095.0*voltageMax/absMax)
-        sleep(halfCycle)
-        dac.set_voltage = 0
-        sleep(halfCycle)
+    maxVal = int(4095.0*voltageMax/absMax)
+    stepAmt = int(36/(frequency/24))
+    increment = maxVal//stepAmt
+    tStep = halfCycle/stepAmt
+    overHeadConstant = 0.000625
+    while True:
+        if (GPIO.input(btn) == 0):
+            return
+        for i in range(0, maxVal+1, increment):
+            dac.raw_value = maxVal
+        for i in range(stepAmt*increment, -1, -increment):
+            dac.raw_value = 0
     return
 
 def waveformTriangle():
     halfCycle = 1.0/(2.0*frequency)
     maxVal = int(4095.0*voltageMax/absMax)
-    stepAmt = 29
+    stepAmt = int(36/(frequency/24))
     increment = maxVal//stepAmt
-    tStep = halfCycle//stepAmt
-    overHeadConstant = 0.0003
-    if (tStep < overHeadConstant):
-        while changeCheck():
-            for i in range(0, maxVal+1, increment):
-                dac.raw_value = i
-            for i in range(stepAmt*maxVal, -1, increment):
-                dac.raw_value = i
-    else:
-        while delta:
-            for i in range(0, maxVal+1, increment):
-                dac.raw_value = i
-                sleep(tStep - overHeadConstant)
-            for i in range(stepAmt*maxVal, -1, increment):
-                dac.raw_value = i
-                sleep(tStep - overHeadConstant)
+    tStep = halfCycle/stepAmt
+    overHeadConstant = 0.000625
+    while True:
+        if (GPIO.input(btn) == 0):
+            return
+        for i in range(0, maxVal+1, increment):
+            dac.raw_value = i
+        for i in range(stepAmt*increment, -1, -increment):
+            dac.raw_value = i
     return
 
 def waveformSin():
     fullCycle = 1.0/frequency
     maxVal = int(4095.0*voltageMax/absMax)
-    tStep = fullCycle/maxVal
-    stepAmt = 16 # Powers of 4 should be the step amount for balanced demonstration
-    while changeCheck():
+    stepAmt = int(35/(frequency/50))
+    tStep = fullCycle/stepAmt
+    while True:
+        if (GPIO.input(btn) == 0):
+            return
         for i in range(0,stepAmt+1,1):
-            dac.raw_value(int(maxVal*(sin(pi*2*i/float(stepAmt))+1)/2.0))
+            dac.raw_value=int(maxVal*(sin(pi*2*i/float(stepAmt))+1)/2.0)
+
     return
+funcDict = {"1": waveformSquare, "2": waveformTriangle, "3": waveformSin}
 
 def main():
     setup()
     dac.raw_value = 0
-    GPIO.add_event_detect(btn, GPIO.FALLING, callback=btnPress)
-    while(True):
-        pass
+    while True:
+        if (GPIO.input(btn) == 0):
+            btnPress()
 
 if __name__ == "__main__":
     main()
