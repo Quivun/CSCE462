@@ -61,8 +61,6 @@ def waveformSquare():
     maxVal = int(4095.0*voltageMax/absMax)
     stepAmt = int(36/(frequency/24))
     increment = maxVal//stepAmt
-    tStep = halfCycle/stepAmt
-    overHeadConstant = 0.000625
     while True:
         if (GPIO.input(btn) == 0):
             return
@@ -77,8 +75,6 @@ def waveformTriangle():
     maxVal = int(4095.0*voltageMax/absMax)
     stepAmt = int(36/(frequency/24))
     increment = maxVal//stepAmt
-    tStep = halfCycle/stepAmt
-    overHeadConstant = 0.000625
     while True:
         if (GPIO.input(btn) == 0):
             return
@@ -92,7 +88,6 @@ def waveformSin():
     fullCycle = 1.0/frequency
     maxVal = int(4095.0*voltageMax/absMax)
     stepAmt = int(35/(frequency/50))
-    tStep = fullCycle/stepAmt
     while True:
         if (GPIO.input(btn) == 0):
             return
