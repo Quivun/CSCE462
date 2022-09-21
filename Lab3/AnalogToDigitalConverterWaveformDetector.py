@@ -1,4 +1,4 @@
-from math import sin, pi
+from math import sin, pi, abs
 from time import sleep
 import wave
 from adafruit_mcp3xxx.analog_in import AnalogIn
@@ -30,12 +30,21 @@ print('Raw ADC Value: ', channel.value)
 # Hardware dependent values
 rPSInt = 1024 # Integer reads per second
 iInt = 1 # Float time before next check
-tolInt = 0 # Integer tolerance value 
+tolInt = 500 # Integer tolerance value 
 
 def s1DataGen():
     waveTotal = []
-    for i in range(0,rPSInt+1,1):
-        waveTotal.append(channel.value)
+    globalVal = channel.value
+    waveTotal.append(globalVal)
+    for i in range(1,rPSInt+1,1):
+        if (abs(waveTotal[i] - globalVal) < tolInt):
+            if (waveTotal[i] < globalVal):
+                globalVal = globalVal - tolInt
+                waveTotal.append(globalVal)
+            else:
+                globalVal = globalVal + tolInt
+                waveTotal.append(globalVal)
+
     return waveTotal
 
 def s2DataClean(waveTotal):
