@@ -32,20 +32,38 @@ rPSInt = 1024 # Integer reads per second
 iInt = 1 # Float time before next check
 tolInt = 0 # Integer tolerance value 
 
-def s1DataGen():
-    waveTotal = []
-    for i in range(0,rPSInt+1,1):
-        waveTotal.append(channel.value)
-    return waveTotal
-
-def s2DataClean(waveTotal):
-    # waveTotal is all data points gathered within an entire second of an unknown waveform
-    freqInt = 0
-    waveArr = []
-    return freqInt,waveArr
-
+def s1DataGens2DataClean():
+    dxList, maxList, minList, waveTotal, waveArr = [],[],[],[],[]
+    curVal, gloVal = 0,0
+    curVal = channel.value
+    waveTotal.append(curVal)
+    curVal = channel.value
+    waveTotal.append(curVal)
+    dxList.append(1 if waveTotal[1] > waveTotal[0] else -1)
+    gloVal = curVal
+    for i in range(0, rPSInt+1,1):
+        curVal = channel
+        if (abs(curVal - gloVal) > int(tolInt)):
+            gloVal = curVal
+            waveTotal.append(gloVal)
+            if(waveTotal[len(waveTotal)-1] - waveTotal[len(waveTotal)-2] > 0):
+                dxList.append(1)
+                if (dxList[len(dxList)-2] != 1):
+                    minList.append(len(waveTotal)-1)
+            else:
+                dxList.append(-1)
+                if(dxList[len(dxList)-2]!= -1):
+                    maxList.append(len(waveTotal)-1)
+        else:
+            waveTotal.append(gloVal)
+            dxList.append(dxList[len(dxList)-1])
+    # waveTotal is all data points gathered within an entire second of an unknown waveform.
+    if (maxList[1] > minList[1]):
+        return (len(maxList)+len(minList))/2,waveTotal[maxList[1]:minList[2]+1]
+    else :
+        return (len(maxList)+len(minList))/2,waveTotal[maxList[1]:minList[2]+1]
 def s3Eval(waveArr):
-    # waveArr is a subsection of the array containing a single full cycle of an unknown waveform.
+    # waveArr is a subsection of the array containing a the max and min of the single waveform from the 25% and 75% marker. 
     ret = "ans"
     return ret
 
@@ -53,11 +71,8 @@ def main():
     curWave = ""
     globalWave = ""
     while True:
-        waveTotal = s1DataGen()
-        
-        freqInt , waveArr = s2DataClean(waveTotal)
+        freqInt, waveArr = s1DataGens2DataClean()
         print("Frequency : ",  freqInt)
-
         curWave = s3Eval(waveArr)
         if (globalWave != curWave):
             globalWave = curWave
