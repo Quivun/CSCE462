@@ -83,20 +83,20 @@ def s3Eval(waveArr):
     dx2 = waveArr[int(len(waveArr) * 0.75) - 1] - waveArr[int(len(waveArr) * 0.25) - 1]
     if abs(dx1 - dx2 < tolDx):
         return "Triangle"
-    # dx3 = waveArr[int(len(waveArr)-1)] - waveArr[int(len(waveArr)*0.75 - 1)]
-    return "Sine"
+    else:
+        return "Sine"  # dx3 = waveArr[int(len(waveArr)-1)] - waveArr[int(len(waveArr)*0.75 - 1)]
 
 
 def main():
+    # The scope of accuracy applies from 1 hz to 1750 hz assumed.
     curWave = ""
-    globalWave = ""
+    globalWave = "NULL"
     while True:
         freqInt, waveArr = s1DataGens2DataClean()
         print("Frequency : ", freqInt)
         curWave = s3Eval(waveArr)
         if globalWave != curWave:
-            globalWave = curWave
-            # Might implement a double check before outputting new Waveform official
+            # Might implement a double check before outputting new Waveform official. Why? Because the waveform and frequency may be changed mid read.
             print("New Waveform detected : ", globalWave)
         sleep(iInt)
 
