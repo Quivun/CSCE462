@@ -1,5 +1,5 @@
 from math import sin, pi, abs
-from time import sleep
+import time
 import wave
 from adafruit_mcp3xxx.analog_in import AnalogIn
 
@@ -7,7 +7,7 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 import busio
 import digitalio
 import board
-import adafruit_mcp4725
+# import adafruit_mcp4725
 import adafruit_mcp3xxx.mcp3008 as MCP
 import RPi.GPIO as GPIO
 
@@ -26,8 +26,8 @@ channel = AnalogIn(mcp, MCP.P0)  # create analog input channel on pin 0
 # Hardware dependent values
 rPSInt = 2000  # Integer reads per second
 iInt = 1.0  # Float time before next check
-tolInt = 1000  # Integer tolerance of RAW value
-tolDx = 100  # Integer tolerance of slope value
+tolInt = 1000  # Integer tolerance of RAW value [0,65535]
+tolDx = 100  # Integer tolerance of slope value [0,65535]
 
 
 def s1DataGens2DataClean():
@@ -47,12 +47,12 @@ def s1DataGens2DataClean():
     xList.append(curVal)
     dxList.append(1 if xList[1] > xList[0] else -1)
     gloVal = curVal
-
+    sTime = time.clock()
     for i in range(
-        0, rPSInt + 1, 1
+        0, rPSInt, 1
     ):  # Cycle a tested amount that is guaranteed 1 second real time for as many times we can read the channel value and populate each list accordingly.
         curVal = channel.value
-        if abs(curVal - gloVal) > int(tolInt):
+        if (abs(curVal - gloVal) > tolInt):
             gloVal = curVal
             xList.append(gloVal)
             if xList[len(xList) - 1] - xList[len(xList) - 2] > 0:
@@ -66,7 +66,8 @@ def s1DataGens2DataClean():
         else:
             xList.append(gloVal)
             dxList.append(dxList[len(dxList) - 1])
-
+    eTime = time.clock()
+    print(eTime-sTime, " is the Elapsed time it took for ", rPSInt, " value reads")
     if (
         maxList[1] > minList[1]
     ):  # Determines if the xList started off measuring a min or a max and adjusting output accordingly.
@@ -98,7 +99,7 @@ def main():
         if globalWave != curWave:
             # Might implement a double check before outputting new Waveform official. Why? Because the waveform and frequency may be changed mid read.
             print("New Waveform detected : ", globalWave)
-        sleep(iInt)
+        time.sleep(iInt)
 
 
 if __name__ == "__main__":
