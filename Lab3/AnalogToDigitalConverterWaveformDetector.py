@@ -26,8 +26,8 @@ channel = AnalogIn(mcp, MCP.P0)  # create analog input channel on pin 0
 # Hardware dependent values
 rPSInt = 2000  # Integer reads per second
 iInt = 1.0  # Float time before next check
-tolInt = 1000  # Integer tolerance of RAW value [0,65535]
-tolDx = 100  # Integer tolerance of slope value [0,65535]
+tolInt = 5000  # Integer tolerance of RAW value [0,65535]
+tolDx = 500  # Integer tolerance of slope value [0,65535]
 
 
 def s1DataGens2DataClean():
@@ -97,6 +97,7 @@ def main():
         print("Frequency : ", freqInt)
         curWave = s3Eval(waveArr)
         if globalWave != curWave:
+            globalWave = curWave
             # Might implement a double check before outputting new Waveform official. Why? Because the waveform and frequency may be changed mid read.
             print("New Waveform detected : ", globalWave)
         time.sleep(iInt)
