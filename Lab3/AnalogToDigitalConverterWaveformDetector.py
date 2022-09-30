@@ -1,4 +1,4 @@
-from math import sin, pi, abs
+from math import sin, pi
 import time
 import wave
 from adafruit_mcp3xxx.analog_in import AnalogIn
