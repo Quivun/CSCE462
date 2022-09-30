@@ -25,10 +25,10 @@ mcp = MCP.MCP3008(spi, cs)  # create mcp object
 channel = AnalogIn(mcp, MCP.P0)  # create analog input channel on pin 0
 
 # Hardware dependent values
-rPSInt = 2000  # Integer reads per second
+rPSInt = 550  # Integer reads per second
 iInt = 1.0  # Float time before next check
-tolInt = 5000  # Integer tolerance of RAW value [0,65535]
-tolDx = 500  # Integer tolerance of slope value [0,65535]
+tolInt = 2500  # Integer tolerance of RAW value [0,65535]
+tolDx = 0  # Integer tolerance of slope value [0,65535]
 
 
 def s1DataGens2DataClean():
@@ -68,11 +68,13 @@ def s1DataGens2DataClean():
             xList.append(gloVal)
             dxList.append(dxList[len(dxList) - 1])
     eTime = time.perf_counter()
+    """
     print("Max List", maxList)
     print("Min List", minList)
     print("X List", xList)
     print("dx List", dxList)
     print(eTime-sTime, " is the Elapsed time it took for ", rPSInt, " value reads")
+    """
     if (
         maxList[1] > minList[1]
     ):  # Determines if the xList started off measuring a min or a max and adjusting output accordingly.
