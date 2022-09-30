@@ -1,4 +1,5 @@
 from math import sin, pi
+from re import X
 import time
 import wave
 from adafruit_mcp3xxx.analog_in import AnalogIn
@@ -47,7 +48,7 @@ def s1DataGens2DataClean():
     xList.append(curVal)
     dxList.append(1 if xList[1] > xList[0] else -1)
     gloVal = curVal
-    sTime = time.clock()
+    sTime = time.perf_counter()
     for i in range(
         0, rPSInt, 1
     ):  # Cycle a tested amount that is guaranteed 1 second real time for as many times we can read the channel value and populate each list accordingly.
@@ -66,7 +67,11 @@ def s1DataGens2DataClean():
         else:
             xList.append(gloVal)
             dxList.append(dxList[len(dxList) - 1])
-    eTime = time.clock()
+    eTime = time.perf_counter()
+    print("Max List", maxList)
+    print("Min List", minList)
+    print("X List", xList)
+    print("dx List", dxList)
     print(eTime-sTime, " is the Elapsed time it took for ", rPSInt, " value reads")
     if (
         maxList[1] > minList[1]
