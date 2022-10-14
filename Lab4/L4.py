@@ -48,6 +48,7 @@ print("End Data Aqcuisition")
 sleep(0.5)
 print("Begin Data Calculation")
 movingAvg = []
+totalDistGlobal = STANDARD_GRAVITY
 for i in range(len(accelerationLists[0])):
     totalDist = (accelerationLists[0][i]**2+accelerationLists[1][i]**2+accelerationLists[2][i]**2)**0.5
     
@@ -55,9 +56,11 @@ for i in range(len(accelerationLists[0])):
         movingAvg.pop(0)
     movingAvg.append(totalDist)
     totalDist = sum(movingAvg)/len(movingAvg)
-    
+    if (i == 0):
+        dTotalList.append(totalDist)
     if (abs(totalDist - totalDistGlobal) > tolAmt):
         totalDistGlobal = totalDist
+        totalList.append(totalDistGlobal)
         if (totalList[len(totalList) - 1] - totalList[len(totalList)-2] > 0):
             dTotalList.append(1)
             if ( dTotalList[len(dTotalList)-2] != 1):
@@ -67,9 +70,9 @@ for i in range(len(accelerationLists[0])):
             if ( dTotalList[len(dTotalList)-2] != -1):
                 maxList.append(len(totalList) - 1)
     else:
+        totalList.append(totalDistGlobal)
         dTotalList.append(dTotalList[len(dTotalList)-1])
 
-    totalList.append(totalDistGlobal)
     
     if (i != 0):
         tList[i] += tList[i-1]-sTime
