@@ -11,8 +11,11 @@ mpu = adafruit_mpu6050.MPU6050(i2c)
 accelerationLists = [[],[],[]]
 tList = []
 totalList = []
-
+dTotalList = []
+minList = []
+maxList = []
 STANDARD_GRAVITY = 9.80665
+tolAmt = 1.75
 
 #Notable Information
 print("Notable Information of intial setup : ")
@@ -47,11 +50,27 @@ print("Begin Data Calculation")
 movingAvg = []
 for i in range(len(accelerationLists[0])):
     totalDist = (accelerationLists[0][i]**2+accelerationLists[1][i]**2+accelerationLists[2][i]**2)**0.5
+    
     if len(movingAvg) >= 10:
         movingAvg.pop(0)
     movingAvg.append(totalDist)
     totalDist = sum(movingAvg)/len(movingAvg)
-    totalList.append(totalDist)
+    
+    if (abs(totalDist - totalDistGlobal) > tolAmt):
+        totalDistGlobal = totalDist
+        if (totalList[len(totalList) - 1] - totalList[len(totalList)-2] > 0):
+            dTotalList.append(1)
+            if ( dTotalList[len(dTotalList)-2] != 1):
+                minList.append(len(totalList) - 1)
+        else:
+            dTotalList.append(-1)
+            if ( dTotalList[len(dTotalList)-2] != -1):
+                maxList.append(len(totalList) - 1)
+    else:
+        dTotalList.append(dTotalList[len(dTotalList)-1])
+
+    totalList.append(totalDistGlobal)
+    
     if (i != 0):
         tList[i] += tList[i-1]-sTime
     else:
@@ -63,6 +82,7 @@ print("End Data Calculation")
 sleep(0.5)
 print("Begin Output Data")
 print("Total Time Elapsed in Data Aquisition : ",eTime-sTime)
+print("Analyzed Steps : ", (len(maxList) + len(minList)/2)/1.5)
 print("Plotting TotalAcceleration (Smoothed over 10 data points) vs Time (Seconds) : ")
 plt.plot(tList,totalList,label="Line 1")
 plt.show()
