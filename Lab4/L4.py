@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 i2c = busio.I2C(board.SCL, board.SDA)
 mpu = adafruit_mpu6050.MPU6050(i2c)
 
+
 accelerationLists = [[],[],[]]
 tList = []
 totalList = []
@@ -15,8 +16,47 @@ dTotalList = []
 minList = []
 maxList = []
 STANDARD_GRAVITY = 9.80665
-tolAmt = 1.75
+tolAmt = 2.00
 
+for i in range(5,0,-1):
+    print("Starting in : ", i)
+    sleep(0.95)
+
+xAcc,yAcc,zAcc = mpu.acceleration
+totalDist = (xAcc**2+yAcc**2+zAcc**2)**0.5
+dTotalList.append(totalDist)
+totalDistGlobal = 9.80665
+globalStep = 0
+
+while True:
+    xAcc,yAcc,zAcc = mpu.acceleration
+    totalDist = (xAcc**2+yAcc**2+zAcc**2)**0.5
+    if (abs(totalDist - totalDistGlobal) > tolAmt):
+        totalDistGlobal = totalDist
+        totalList.append(totalDistGlobal)
+        if (totalList[len(totalList)-1] - totalList[len(totalList)-2] > 0):
+            dTotalList.append(1)
+            if (dTotalList[len(dTotalList)-2] != 1):
+                minList.append(len(totalList)-1)
+        else:
+            dTotalList.append(-1)
+            if (dTotalList[len(dTotalList)-2] != -1):
+                maxList.append(len(totalList) - 1)
+    else:
+        totalList.append(totalDistGlobal)
+        dTotalList.append(dTotalList[len(dTotalList)-1])
+    
+    curStep = (len(maxList) + len(minList)/2)/1.5
+
+    if (curStep > globalStep):
+        globalStep = curStep
+        print(globalStep)
+
+    if (len(totalList) > 5):
+        totalList.pop(0)
+    if (len(dTotalList) > 5):
+        dTotalList.pop(0)
+"""
 #Notable Information
 print("Notable Information of intial setup : ")
 print("Temperature in Celsius : ",mpu.temperature)
@@ -91,3 +131,4 @@ plt.plot(tList,totalList,label="Line 1")
 plt.show()
 print("End Output Data")
 #End Outpout Data
+"""
