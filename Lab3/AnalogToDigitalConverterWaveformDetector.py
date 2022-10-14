@@ -27,8 +27,8 @@ channel = AnalogIn(mcp, MCP.P0)  # create analog input channel on pin 0
 # Hardware dependent values
 rPSInt = 550  # Integer reads per second
 iInt = 1.0  # Float time before next check
-tolInt = 2500  # Integer tolerance of RAW value [0,65535]
-tolDx = 0  # Integer tolerance of slope value [0,65535]
+tolInt = 5000  # Integer tolerance of RAW value [0,65535]
+tolDx = 1000  # Integer tolerance of slope value [0,65535]
 
 
 def s1DataGens2DataClean():
