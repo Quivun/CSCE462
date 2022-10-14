@@ -16,9 +16,9 @@ dTotalList = []
 minList = []
 maxList = []
 STANDARD_GRAVITY = 9.80665
-tolAmt = 2.00
+tolAmt = 2.0
 
-for i in range(5,0,-1):
+for i in range(3,0,-1):
     print("Starting in : ", i)
     sleep(0.95)
 
@@ -27,10 +27,11 @@ totalDist = (xAcc**2+yAcc**2+zAcc**2)**0.5
 dTotalList.append(totalDist)
 totalDistGlobal = 9.80665
 globalStep = 0
+tolAmt = 4.0
 
 while True:
     xAcc,yAcc,zAcc = mpu.acceleration
-    totalDist = (xAcc**2+yAcc**2+zAcc**2)**0.5
+    totalDist = (abs(xAcc)**2+abs(yAcc)**2+abs(zAcc)**2)**0.5
     if (abs(totalDist - totalDistGlobal) > tolAmt):
         totalDistGlobal = totalDist
         totalList.append(totalDistGlobal)
@@ -46,16 +47,17 @@ while True:
         totalList.append(totalDistGlobal)
         dTotalList.append(dTotalList[len(dTotalList)-1])
     
-    curStep = (len(maxList) + len(minList)/2)/1.5
+    curStep = len(maxList)
 
     if (curStep > globalStep):
         globalStep = curStep
         print(globalStep)
 
-    if (len(totalList) > 5):
+    if (len(totalList) > 50):
         totalList.pop(0)
-    if (len(dTotalList) > 5):
+    if (len(dTotalList) > 50):
         dTotalList.pop(0)
+        
 """
 #Notable Information
 print("Notable Information of intial setup : ")
